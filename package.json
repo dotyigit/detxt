@@ -1,0 +1,55 @@
+{
+  "name": "detxt",
+  "version": "0.1.0",
+  "description": "High-performance HTML cleaning and SEO analysis for AI pipelines",
+  "license": "MIT",
+  "author": "dotyigit",
+  "homepage": "https://github.com/dotyigit/detxt#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dotyigit/detxt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dotyigit/detxt/issues"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "keywords": [
+    "html",
+    "cleaner",
+    "parser",
+    "text",
+    "seo",
+    "keyword",
+    "analysis",
+    "ai",
+    "nlp",
+    "content",
+    "extract",
+    "scrape"
+  ],
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json -w",
+    "test": "echo \"No tests configured\""
+  },
+  "dependencies": {
+    "htmlparser2": "^10.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
