@@ -1,6 +1,7 @@
 import { parseDocument } from "htmlparser2";
 import type { AnyNode, Element, Text } from "domhandler";
 import { collapseWhitespace, isEmptyText } from "./utils.js";
+import { extractSchemasFromDom } from "./schema.js";
 import type { CleanDocument, CleanNode, CleanOptions, MetaInfo } from "./types.js";
 
 const DEFAULT_REMOVE_TAGS = [
@@ -163,6 +164,7 @@ export function cleanHtml(html: string, options: CleanOptions = {}): CleanDocume
   });
 
   const meta = extractMeta(document, normalizeWhitespace);
+  const schema = extractSchemasFromDom(document, options);
 
   const nodes: CleanNode[] = [];
   const rootId = 0;
@@ -251,6 +253,7 @@ export function cleanHtml(html: string, options: CleanOptions = {}): CleanDocume
     rootId,
     nodes,
     meta,
+    schema,
     headings: [],
     links: [],
     stats: {

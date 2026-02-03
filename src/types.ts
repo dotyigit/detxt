@@ -69,6 +69,30 @@ export interface SeoSummary {
 
 export type UrlClassification = "internal" | "external" | "inline" | "ignored" | "missing";
 
+export interface JsonLdEntry {
+  raw?: string;
+  value?: unknown;
+  error?: string;
+}
+
+export interface MicrodataValue {
+  type: "text" | "item";
+  value?: string;
+  itemId?: number;
+}
+
+export interface MicrodataItem {
+  id: number;
+  types: string[];
+  itemid?: string;
+  properties: Record<string, MicrodataValue[]>;
+}
+
+export interface SchemaInfo {
+  jsonLd: JsonLdEntry[];
+  microdata: MicrodataItem[];
+}
+
 export interface ImageInfo {
   nodeId: number;
   src?: string;
@@ -138,6 +162,7 @@ export interface CleanDocument {
   headings: HeadingInfo[];
   headingTree?: HeadingNode[];
   headingSections?: HeadingSection[];
+  schema?: SchemaInfo;
   links: LinkInfo[];
   stats: Stats;
   index?: DocumentIndex;
@@ -161,6 +186,10 @@ export interface CleanOptions {
   includeHead?: boolean;
   includeMetaTags?: boolean;
   includeTitleTag?: boolean;
+  extractJsonLd?: boolean;
+  includeJsonLdRaw?: boolean;
+  parseJsonLd?: boolean;
+  extractMicrodata?: boolean;
 }
 
 export interface IndexOptions {

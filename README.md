@@ -121,6 +121,20 @@ console.log(result.images[0]);
 
 Image analysis returns per-image details (src, alt, lazy, linked, etc.) and a fast summary.
 
+## Schema Extraction (JSON-LD + Microdata)
+
+```ts
+import { analyzeHtml } from "detxt";
+
+const document = analyzeHtml(html);
+const schema = document.schema;
+
+console.log(schema.jsonLd);
+console.log(schema.microdata);
+```
+
+JSON-LD scripts are parsed (with errors preserved), and Microdata (`itemscope` / `itemprop`) is extracted into structured objects.
+
 ## API Overview
 
 - `cleanHtml(html, options)`
@@ -133,6 +147,7 @@ Image analysis returns per-image details (src, alt, lazy, linked, etc.) and a fa
 - `getTopWords(index, options)`
 - `analyzeSeo(document, options)`
 - `analyzeImages(document, options)`
+- `extractSchemas(html, options)`
 
 See `src/types.ts` for full option and type definitions.
 
@@ -140,12 +155,15 @@ See `src/types.ts` for full option and type definitions.
 
 - `CleanOptions.removeTags` overrides the default removal list.
 - `CleanOptions.keepAttributes` defaults to a minimal SEO-friendly set (`href`, `rel`, `alt`, `src`). Use `[]` to drop all attributes.
+- `CleanOptions.extractJsonLd` / `extractMicrodata` control schema extraction.
+- `CleanOptions.parseJsonLd` parses JSON-LD into objects (errors captured).
 - `IndexOptions.buildTagIndex` builds a `tag -> nodeId[]` map for fast lookups.
 - `IndexOptions.buildHeadingSections` builds heading sections during indexing.
 - `KeywordSearchOptions.strategy` chooses `wordset`, `indexOf`, or `aho-corasick`.
 - `KeywordSearchOptions.matchWholeWords` uses word boundaries for accurate counts.
 - `SeoOptions.baseUrl` enables internal vs external link classification.
 - `ImageAnalysisOptions.baseUrl` enables internal vs external image classification.
+- `CleanOptions.extractJsonLd` and `CleanOptions.extractMicrodata` toggle schema extraction.
 
 ## Testing
 
