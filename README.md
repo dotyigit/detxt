@@ -56,6 +56,27 @@ console.log(document.headingTree);
 
 The heading tree is a nested structure of `{ level, text, nodeId, children }` built from `<h1>`–`<h6>` elements.
 
+## Heading Sections
+
+```ts
+import { analyzeHtml, buildHeadingSections } from "detxt";
+
+const document = analyzeHtml(html);
+const sections = buildHeadingSections(document);
+
+console.log(sections);
+```
+
+Heading sections group the text content that follows each heading until the next heading of the same or higher level. Each section is `{ level, text, nodeId, content, children }`.
+
+If you want sections built during indexing:
+
+```ts
+const document = analyzeHtml(html, {
+  indexOptions: { buildHeadingSections: true }
+});
+```
+
 ## Keyword Research
 
 ```ts
@@ -79,6 +100,7 @@ const keywords = searchKeywords(document, ["seo", "html", "ai"], {
 - `analyzeHtml(html, options)`
 - `buildIndex(document, options)`
 - `buildHeadingTree(document)`
+- `buildHeadingSections(document, options)`
 - `searchKeywords(documentOrIndex, keywords, options)`
 - `containsKeyword(documentOrIndex, keyword, options)`
 - `getTopWords(index, options)`
@@ -89,6 +111,7 @@ See `src/types.ts` for full option and type definitions.
 
 - `CleanOptions.removeTags` overrides the default removal list.
 - `IndexOptions.buildTagIndex` builds a `tag -> nodeId[]` map for fast lookups.
+- `IndexOptions.buildHeadingSections` builds heading sections during indexing.
 - `KeywordSearchOptions.strategy` chooses `wordset`, `indexOf`, or `aho-corasick`.
 - `KeywordSearchOptions.matchWholeWords` uses word boundaries for accurate counts.
 

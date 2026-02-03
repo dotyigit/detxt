@@ -7,6 +7,8 @@ import type {
   DocumentIndex,
   HeadingInfo,
   HeadingNode,
+  HeadingSection,
+  HeadingSectionOptions,
   IndexOptions,
   LinkInfo,
   Stats,
@@ -44,6 +46,102 @@ function buildHeadingTreeFromList(headings: HeadingInfo[]): HeadingNode[] {
     }
 
     stack.push(node);
+  }
+
+  return roots;
+}
+
+function buildHeadingSectionsFromDocument(
+  document: CleanDocument,
+  options: HeadingSectionOptions = {}
+): HeadingSection[] {
+  const includeHeadingText = options.includeHeadingText ?? false;
+  const headingByNodeId = new Map<number, HeadingInfo>();
+  for (const heading of document.headings) {
+    headingByNodeId.set(heading.nodeId, heading);
+  }
+
+  if (headingByNodeId.size === 0) {
+    return [];
+  }
+
+  const roots: HeadingSection[] = [];
+  const stack: HeadingSection[] = [];
+  let headingDepth = 0;
+
+  const appendContent = (section: HeadingSection, text: string) => {
+    if (!text) {
+      return;
+    }
+    section.content = section.content ? `${section.content} ${text}` : text;
+  };
+
+  const walk: Array<{ nodeId: number; entering: boolean }> = [
+    { nodeId: document.rootId, entering: true },
+  ];
+
+  while (walk.length > 0) {
+    const frame = walk.pop() as { nodeId: number; entering: boolean };
+    const node = document.nodes[frame.nodeId];
+
+    if (frame.entering) {
+      if (node.type === "root") {
+        const children = node.children ?? [];
+        for (let i = children.length - 1; i >= 0; i -= 1) {
+          walk.push({ nodeId: children[i], entering: true });
+        }
+        continue;
+      }
+
+      if (node.type === "element") {
+        const heading = headingByNodeId.get(node.id);
+        if (heading) {
+          const section: HeadingSection = {
+            level: heading.level,
+            text: heading.text,
+            nodeId: heading.nodeId,
+            content: "",
+            children: [],
+          };
+
+          while (stack.length > 0 && stack[stack.length - 1].level >= section.level) {
+            stack.pop();
+          }
+
+          if (stack.length === 0) {
+            roots.push(section);
+          } else {
+            stack[stack.length - 1].children.push(section);
+          }
+
+          stack.push(section);
+          headingDepth += 1;
+        }
+
+        walk.push({ nodeId: node.id, entering: false });
+        const children = node.children ?? [];
+        for (let i = children.length - 1; i >= 0; i -= 1) {
+          walk.push({ nodeId: children[i], entering: true });
+        }
+        continue;
+      }
+
+      if (node.type === "text") {
+        if (stack.length === 0) {
+          continue;
+        }
+        if (headingDepth > 0 && !includeHeadingText) {
+          continue;
+        }
+        if (node.text) {
+          appendContent(stack[stack.length - 1], node.text);
+        }
+      }
+    } else if (node.type === "element") {
+      if (headingByNodeId.has(node.id)) {
+        headingDepth = Math.max(headingDepth - 1, 0);
+      }
+    }
   }
 
   return roots;
@@ -216,6 +314,12 @@ export function buildIndex(
 
   document.headings = headings;
   document.headingTree = buildHeadingTreeFromList(headings);
+  if (options.buildHeadingSections) {
+    document.headingSections = buildHeadingSectionsFromDocument(
+      document,
+      options.headingSectionOptions
+    );
+  }
   document.links = links;
   document.stats = stats;
   document.index = index;
@@ -230,6 +334,15 @@ export function buildHeadingTree(document: CleanDocument): HeadingNode[] {
   const tree = buildHeadingTreeFromList(document.headings);
   document.headingTree = tree;
   return tree;
+}
+
+export function buildHeadingSections(
+  document: CleanDocument,
+  options: HeadingSectionOptions = {}
+): HeadingSection[] {
+  const sections = buildHeadingSectionsFromDocument(document, options);
+  document.headingSections = sections;
+  return sections;
 }
 
 export function analyzeHtml(html: string, options: AnalyzeOptions = {}): CleanDocument {

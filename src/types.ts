@@ -31,6 +31,18 @@ export interface HeadingNode {
   children: HeadingNode[];
 }
 
+export interface HeadingSection {
+  level: number;
+  text: string;
+  nodeId: number;
+  content: string;
+  children: HeadingSection[];
+}
+
+export interface HeadingSectionOptions {
+  includeHeadingText?: boolean;
+}
+
 export interface LinkInfo {
   href?: string;
   rel?: string;
@@ -52,6 +64,7 @@ export interface CleanDocument {
   meta: MetaInfo;
   headings: HeadingInfo[];
   headingTree?: HeadingNode[];
+  headingSections?: HeadingSection[];
   links: LinkInfo[];
   stats: Stats;
   index?: DocumentIndex;
@@ -82,6 +95,8 @@ export interface IndexOptions {
   includeTitle?: boolean;
   includeMeta?: boolean;
   buildTagIndex?: boolean;
+  buildHeadingSections?: boolean;
+  headingSectionOptions?: HeadingSectionOptions;
   minWordLength?: number;
   includeNumbers?: boolean;
   allowApostrophe?: boolean;
