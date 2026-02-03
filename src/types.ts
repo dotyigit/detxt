@@ -24,6 +24,13 @@ export interface HeadingInfo {
   nodeId: number;
 }
 
+export interface HeadingNode {
+  level: number;
+  text: string;
+  nodeId: number;
+  children: HeadingNode[];
+}
+
 export interface LinkInfo {
   href?: string;
   rel?: string;
@@ -44,6 +51,7 @@ export interface CleanDocument {
   nodes: CleanNode[];
   meta: MetaInfo;
   headings: HeadingInfo[];
+  headingTree?: HeadingNode[];
   links: LinkInfo[];
   stats: Stats;
   index?: DocumentIndex;

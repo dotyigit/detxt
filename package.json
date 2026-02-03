@@ -44,7 +44,12 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json -w",
-    "test": "echo \"No tests configured\""
+    "pretest": "npm run build",
+    "test": "node --test",
+    "prepublishOnly": "npm test",
+    "release:patch": "npm version patch",
+    "release:minor": "npm version minor",
+    "release:major": "npm version major"
   },
   "dependencies": {
     "htmlparser2": "^10.0.0"

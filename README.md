@@ -1,6 +1,18 @@
 # detxt
 
+[![CI](https://github.com/dotyigit/detxt/actions/workflows/ci.yml/badge.svg)](https://github.com/dotyigit/detxt/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/detxt)](https://www.npmjs.com/package/detxt)
+[![license](https://img.shields.io/npm/l/detxt)](https://github.com/dotyigit/detxt/blob/main/LICENSE)
+
 High-performance HTML cleaning and SEO/keyword analysis for AI pipelines. The library builds a compact node tree, removes non-content nodes, and provides fast keyword/search utilities.
+
+## Features
+
+- Compact node tree with numeric IDs and children arrays.
+- Aggressive removal of non-content tags (script, style, svg, etc.) by default.
+- Fast keyword search with word-set, `indexOf`, or Aho-Corasick strategies.
+- Built-in heading extraction and hierarchical heading tree.
+- Lightweight dependency footprint (only `htmlparser2`).
 
 ## Install
 
@@ -26,19 +38,82 @@ const result = searchKeywords(document, ["fast", "hello"], {
 console.log(result.hits.fast?.count); // 1
 ```
 
-## Design Notes
+## Heading Tree
 
-- **Compact tree**: Nodes are stored in a flat array with `children` pointing to node IDs.
-- **Fast keyword lookup**: Uses word counts for whole-word search, and Aho-Corasick for large keyword sets.
-- **Low dependency**: Only `htmlparser2` is required.
+```ts
+import { analyzeHtml } from "detxt";
 
-## Main APIs
+const html = `
+  <h1>Main</h1>
+  <h2>Section A</h2>
+  <h3>Subsection A.1</h3>
+  <h2>Section B</h2>
+`;
+
+const document = analyzeHtml(html);
+console.log(document.headingTree);
+```
+
+The heading tree is a nested structure of `{ level, text, nodeId, children }` built from `<h1>`–`<h6>` elements.
+
+## Keyword Research
+
+```ts
+import { analyzeHtml, getTopWords, searchKeywords } from "detxt";
+
+const document = analyzeHtml(html);
+
+const topWords = getTopWords(document.index, {
+  limit: 10,
+  minLength: 4,
+});
+
+const keywords = searchKeywords(document, ["seo", "html", "ai"], {
+  matchWholeWords: true,
+});
+```
+
+## API Overview
 
 - `cleanHtml(html, options)`
 - `analyzeHtml(html, options)`
 - `buildIndex(document, options)`
+- `buildHeadingTree(document)`
 - `searchKeywords(documentOrIndex, keywords, options)`
 - `containsKeyword(documentOrIndex, keyword, options)`
 - `getTopWords(index, options)`
 
 See `src/types.ts` for full option and type definitions.
+
+## Options Highlights
+
+- `CleanOptions.removeTags` overrides the default removal list.
+- `IndexOptions.buildTagIndex` builds a `tag -> nodeId[]` map for fast lookups.
+- `KeywordSearchOptions.strategy` chooses `wordset`, `indexOf`, or `aho-corasick`.
+- `KeywordSearchOptions.matchWholeWords` uses word boundaries for accurate counts.
+
+## Testing
+
+```bash
+npm test
+```
+
+## Versioning
+
+This project follows SemVer. Use `npm version patch|minor|major` to bump versions.
+
+## CI
+
+GitHub Actions runs build and tests on every push and pull request. The badge above reflects the latest status.
+
+## Release (Git Tag Flow)
+
+This repo publishes to npm automatically when you push a Git tag that matches the package version.
+
+1. Make sure your npm token is saved in GitHub as a secret named `NPM_TOKEN`.
+2. Bump version and create tag:
+   - `npm version patch` (or `minor` / `major`)
+3. Push commits and tag:
+   - `git push origin main --tags`
+
+When the `vX.Y.Z` tag is pushed, GitHub Actions runs tests and publishes the package.

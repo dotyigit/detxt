@@ -6,6 +6,7 @@ import type {
   CleanDocument,
   DocumentIndex,
   HeadingInfo,
+  HeadingNode,
   IndexOptions,
   LinkInfo,
   Stats,
@@ -18,6 +19,34 @@ function getHeadingLevel(tag: string): number | null {
 
   const level = Number(tag[1]);
   return Number.isInteger(level) && level >= 1 && level <= 6 ? level : null;
+}
+
+function buildHeadingTreeFromList(headings: HeadingInfo[]): HeadingNode[] {
+  const roots: HeadingNode[] = [];
+  const stack: HeadingNode[] = [];
+
+  for (const heading of headings) {
+    const node: HeadingNode = {
+      level: heading.level,
+      text: heading.text,
+      nodeId: heading.nodeId,
+      children: [],
+    };
+
+    while (stack.length > 0 && stack[stack.length - 1].level >= node.level) {
+      stack.pop();
+    }
+
+    if (stack.length === 0) {
+      roots.push(node);
+    } else {
+      stack[stack.length - 1].children.push(node);
+    }
+
+    stack.push(node);
+  }
+
+  return roots;
 }
 
 export function buildIndex(
@@ -100,7 +129,12 @@ export function buildIndex(
     const node = document.nodes[frame.nodeId];
 
     if (frame.entering) {
-      if (node.type === "element") {
+      if (node.type === "root") {
+        const children = node.children ?? [];
+        for (let i = children.length - 1; i >= 0; i -= 1) {
+          stack.push({ nodeId: children[i], entering: true });
+        }
+      } else if (node.type === "element") {
         const tag = node.tag ?? "";
         if (buildTagIndex && tag) {
           const list = tagIndex?.get(tag) ?? [];
@@ -181,6 +215,7 @@ export function buildIndex(
   };
 
   document.headings = headings;
+  document.headingTree = buildHeadingTreeFromList(headings);
   document.links = links;
   document.stats = stats;
   document.index = index;
@@ -189,6 +224,12 @@ export function buildIndex(
   }
 
   return index;
+}
+
+export function buildHeadingTree(document: CleanDocument): HeadingNode[] {
+  const tree = buildHeadingTreeFromList(document.headings);
+  document.headingTree = tree;
+  return tree;
 }
 
 export function analyzeHtml(html: string, options: AnalyzeOptions = {}): CleanDocument {
