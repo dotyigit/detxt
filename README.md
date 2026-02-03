@@ -94,6 +94,19 @@ const keywords = searchKeywords(document, ["seo", "html", "ai"], {
 });
 ```
 
+## SEO Summary
+
+```ts
+import { analyzeHtml, analyzeSeo } from "detxt";
+
+const document = analyzeHtml(html);
+const summary = analyzeSeo(document, { baseUrl: "https://example.com" });
+
+console.log(summary);
+```
+
+The summary includes title/meta lengths, heading counts, internal vs external links, nofollow links, image alt coverage, and canonical URL.
+
 ## API Overview
 
 - `cleanHtml(html, options)`
@@ -104,16 +117,19 @@ const keywords = searchKeywords(document, ["seo", "html", "ai"], {
 - `searchKeywords(documentOrIndex, keywords, options)`
 - `containsKeyword(documentOrIndex, keyword, options)`
 - `getTopWords(index, options)`
+- `analyzeSeo(document, options)`
 
 See `src/types.ts` for full option and type definitions.
 
 ## Options Highlights
 
 - `CleanOptions.removeTags` overrides the default removal list.
+- `CleanOptions.keepAttributes` defaults to a minimal SEO-friendly set (`href`, `rel`, `alt`, `src`). Use `[]` to drop all attributes.
 - `IndexOptions.buildTagIndex` builds a `tag -> nodeId[]` map for fast lookups.
 - `IndexOptions.buildHeadingSections` builds heading sections during indexing.
 - `KeywordSearchOptions.strategy` chooses `wordset`, `indexOf`, or `aho-corasick`.
 - `KeywordSearchOptions.matchWholeWords` uses word boundaries for accurate counts.
+- `SeoOptions.baseUrl` enables internal vs external link classification.
 
 ## Testing
 

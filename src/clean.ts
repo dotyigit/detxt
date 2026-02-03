@@ -15,6 +15,12 @@ const DEFAULT_REMOVE_TAGS = [
   "embed",
 ];
 
+const DEFAULT_KEEP_ATTRIBUTES: Record<string, string[]> = {
+  a: ["href", "rel"],
+  img: ["alt", "src"],
+  link: ["href", "rel"],
+};
+
 function collectDomText(node: AnyNode, normalizeWhitespace: boolean): string {
   const parts: string[] = [];
   const stack: AnyNode[] = [node];
@@ -82,6 +88,16 @@ function extractMeta(document: AnyNode, normalizeWhitespace: boolean): MetaInfo 
           }
         }
       }
+
+      if (tag === "link") {
+        const rel = element.attribs?.rel?.toLowerCase();
+        if (rel && rel.split(/\s+/g).includes("canonical")) {
+          const href = element.attribs?.href;
+          if (href && !meta.canonicalUrl) {
+            meta.canonicalUrl = href;
+          }
+        }
+      }
     }
 
     const children = (node as Element).children ?? [];
@@ -137,6 +153,7 @@ function filterAttributes(
 export function cleanHtml(html: string, options: CleanOptions = {}): CleanDocument {
   const normalizeWhitespace = options.normalizeWhitespace ?? true;
   const removeTags = new Set(options.removeTags ?? DEFAULT_REMOVE_TAGS);
+  const keepAttributes = options.keepAttributes ?? DEFAULT_KEEP_ATTRIBUTES;
 
   const document = parseDocument(html, {
     lowerCaseTags: true,
@@ -208,7 +225,7 @@ export function cleanHtml(html: string, options: CleanOptions = {}): CleanDocume
       }
 
       const id = nodes.length;
-      const attrs = filterAttributes(tag, element.attribs, options.keepAttributes);
+      const attrs = filterAttributes(tag, element.attribs, keepAttributes);
       nodes.push({
         id,
         type: "element",

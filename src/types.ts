@@ -14,6 +14,7 @@ export interface MetaInfo {
   title?: string;
   description?: string;
   keywords?: string;
+  canonicalUrl?: string;
   lang?: string;
   other: Record<string, string>;
 }
@@ -41,6 +42,29 @@ export interface HeadingSection {
 
 export interface HeadingSectionOptions {
   includeHeadingText?: boolean;
+}
+
+export interface SeoOptions {
+  baseUrl?: string;
+  ignoreProtocols?: string[];
+}
+
+export interface SeoSummary {
+  titleLength: number;
+  descriptionLength: number;
+  wordCount: number;
+  uniqueWords: number;
+  h1Count: number;
+  headingCounts: Record<string, number>;
+  linkCount: number;
+  internalLinks: number;
+  externalLinks: number;
+  nofollowLinks: number;
+  ignoredLinks: number;
+  linksMissingHref: number;
+  imageCount: number;
+  imagesMissingAlt: number;
+  canonicalUrl?: string;
 }
 
 export interface LinkInfo {
