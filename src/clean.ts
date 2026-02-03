@@ -17,7 +17,7 @@ const DEFAULT_REMOVE_TAGS = [
 
 const DEFAULT_KEEP_ATTRIBUTES: Record<string, string[]> = {
   a: ["href", "rel"],
-  img: ["alt", "src"],
+  img: ["alt", "src", "srcset", "data-src", "data-srcset", "loading", "width", "height", "title"],
   link: ["href", "rel"],
 };
 

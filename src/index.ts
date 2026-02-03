@@ -4,3 +4,4 @@ export * from "./indexer.js";
 export * from "./search.js";
 export * from "./research.js";
 export * from "./seo.js";
+export * from "./images.js";

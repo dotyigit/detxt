@@ -67,6 +67,55 @@ export interface SeoSummary {
   canonicalUrl?: string;
 }
 
+export type UrlClassification = "internal" | "external" | "inline" | "ignored" | "missing";
+
+export interface ImageInfo {
+  nodeId: number;
+  src?: string;
+  alt?: string;
+  title?: string;
+  loading?: string;
+  width?: string;
+  height?: string;
+  srcset?: string;
+  dataSrc?: string;
+  dataSrcset?: string;
+  effectiveSrc?: string;
+  hasAlt: boolean;
+  isLazy: boolean;
+  isLinked: boolean;
+  linkHref?: string;
+  linkRel?: string;
+  urlType?: UrlClassification;
+  path?: string;
+}
+
+export interface ImageSummary {
+  total: number;
+  uniqueSrc: number;
+  missingSrc: number;
+  missingAlt: number;
+  linkedImages: number;
+  lazyImages: number;
+  withSrcset: number;
+  inlineImages: number;
+  internalImages: number;
+  externalImages: number;
+  ignoredImages: number;
+}
+
+export interface ImageAnalysisOptions {
+  baseUrl?: string;
+  ignoreProtocols?: string[];
+  includePath?: boolean;
+  pathMaxDepth?: number;
+}
+
+export interface ImageAnalysisResult {
+  summary: ImageSummary;
+  images: ImageInfo[];
+}
+
 export interface LinkInfo {
   href?: string;
   rel?: string;

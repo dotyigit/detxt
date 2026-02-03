@@ -107,6 +107,20 @@ console.log(summary);
 
 The summary includes title/meta lengths, heading counts, internal vs external links, nofollow links, image alt coverage, and canonical URL.
 
+## Image Analysis
+
+```ts
+import { analyzeHtml, analyzeImages } from "detxt";
+
+const document = analyzeHtml(html);
+const result = analyzeImages(document, { baseUrl: "https://example.com" });
+
+console.log(result.summary);
+console.log(result.images[0]);
+```
+
+Image analysis returns per-image details (src, alt, lazy, linked, etc.) and a fast summary.
+
 ## API Overview
 
 - `cleanHtml(html, options)`
@@ -118,6 +132,7 @@ The summary includes title/meta lengths, heading counts, internal vs external li
 - `containsKeyword(documentOrIndex, keyword, options)`
 - `getTopWords(index, options)`
 - `analyzeSeo(document, options)`
+- `analyzeImages(document, options)`
 
 See `src/types.ts` for full option and type definitions.
 
@@ -130,6 +145,7 @@ See `src/types.ts` for full option and type definitions.
 - `KeywordSearchOptions.strategy` chooses `wordset`, `indexOf`, or `aho-corasick`.
 - `KeywordSearchOptions.matchWholeWords` uses word boundaries for accurate counts.
 - `SeoOptions.baseUrl` enables internal vs external link classification.
+- `ImageAnalysisOptions.baseUrl` enables internal vs external image classification.
 
 ## Testing
 
